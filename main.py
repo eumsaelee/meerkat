@@ -10,10 +10,9 @@ from config import settings
 
 async def main():
     model = settings.MODEL()
-
-    reader = FrameReader(settings.VIDEO_SOURCE)
-    buffer = FrameBuffer(settings.BUFFER_SIZE)
-    updater = FrameUpdater(reader, buffer, model.encode)
+    updater = FrameUpdater(FrameReader(settings.VIDEO_SOURCE),
+                           FrameBuffer(settings.BUFFER_SIZE),
+                           model.encode)
     updater.start()
 
     websocket_uri = settings.WEBSOCKET_URI
@@ -26,7 +25,8 @@ async def main():
         traceback.print_exc()
     finally:
         model.release()
-        reader.release()
+        updater.stop(is_released=True)
+        updater.join()
 
 
 if __name__ == '__main__':

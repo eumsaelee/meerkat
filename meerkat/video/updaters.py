@@ -48,8 +48,10 @@ class FrameUpdater(Updater):
             frame = self._reader.read()
             self._buffer.put(frame)
 
-    def stop(self):
+    def stop(self, is_released=False):
         self._halt = True
+        if is_released:
+            self._reader.release()
 
     def read(self, timeout: float=None) -> Any:
         frame = self._buffer.get(timeout)
