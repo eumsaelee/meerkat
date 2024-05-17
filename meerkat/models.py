@@ -6,7 +6,7 @@ import cv2
 import torch
 import numpy as np
 
-import meerkat.vision.payload as Payload
+import meerkat.payload as Payload
 
 
 # --- Exceptions ---

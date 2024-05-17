@@ -1,10 +1,10 @@
 import asyncio
 import traceback
 
-from meerkat.video.readers import FrameReader
-from meerkat.video.buffers import FrameBuffer
-from meerkat.video.updaters import FrameUpdater
-from meerkat.video.streamers import streaming, StreamingConfig
+from meerkat.readers import FrameReader
+from meerkat.buffers import FrameBuffer
+from meerkat.updaters import FrameUpdater
+from meerkat.streamers import streaming, StreamingConfig
 from config import settings
 
 

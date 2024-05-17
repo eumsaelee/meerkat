@@ -4,8 +4,8 @@ from typing import Callable, Any
 
 import numpy as np
 
-from meerkat.video.readers import Reader
-from meerkat.video.buffers import Buffer
+from meerkat.readers import Reader
+from meerkat.buffers import Buffer
 
 
 # --- Interface ---

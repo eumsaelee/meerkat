@@ -3,7 +3,7 @@ from typing import Dict
 import numpy as np
 from ultralytics import YOLO
 
-from meerkat.vision.models import BaseModel
+from meerkat.models import BaseModel
 
 
 class Identity(BaseModel):

@@ -6,8 +6,6 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from meerkat.utils import deprecated
-
 
 # --- Exception ---
 
@@ -57,9 +55,6 @@ class Buffer(ABC):
 
 
 class FrameBuffer(Buffer):
-    @deprecated('It was separated from the FrameBuffer and '
-                'implemented as an independent function. Use '
-                'meerkat.video.inspect_buffersize() instead.')
     @staticmethod
     def inspect_buffersize(value: int) -> int:
         if isinstance(value, int) and value > 0:

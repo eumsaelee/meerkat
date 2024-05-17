@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 
 from loguru import logger
 
-from meerkat.video.updaters import Updater
+from meerkat.updaters import Updater
 
 
 # --- Dataclass ---
