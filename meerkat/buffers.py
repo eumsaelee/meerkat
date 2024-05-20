@@ -55,12 +55,6 @@ class Buffer(ABC):
 
 
 class FrameBuffer(Buffer):
-    @staticmethod
-    def inspect_buffersize(value: int) -> int:
-        if isinstance(value, int) and value > 0:
-            return value
-        raise BufferSizeError(value)
-
     def __init__(self, size: int=1):
         super().__init__(inspect_buffersize(size))
         self._frames = []
