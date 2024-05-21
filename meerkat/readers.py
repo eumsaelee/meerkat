@@ -1,27 +1,27 @@
+"""
+    Exceptions:
+        - FailedOpenError
+        - FailedReadError
+
+    Interfaces:
+        - Reader
+
+    Classes:
+        - FrameReader(Reader)
+"""
+
 import threading
-from typing import Union, Any
+from typing import Union
 from abc import ABC, abstractmethod
 
 import cv2
 import numpy as np
 
-
-# --- Exception ---
-
-
-class FailedOpenError(Exception):
-    def __init__(self, video_source: Any):
-        message = f'Failed to open {video_source!r}.'
-        super().__init__(message)
+from meerkat.common import CommonException
 
 
-class FailedReadError(Exception):
-    def __init__(self, video_source: Any):
-        message = f'Failed to read frame from {video_source!r}'
-        super().__init__(message)
-
-
-# --- Interface ---
+class FailedOpenError(CommonException): pass
+class FailedReadError(CommonException): pass
 
 
 class Reader(ABC):
@@ -47,9 +47,6 @@ class Reader(ABC):
         pass
 
 
-# --- Class ---
-
-
 class FrameReader(Reader):
     def __init__(self, video_source: Union[int, str]=None):
         super().__init__(video_source)
@@ -65,10 +62,11 @@ class FrameReader(Reader):
     @video_source.setter
     def video_source(self, value: Union[int, str]):
         with self._lock:
+            self._cap.release()
             self._cap.open(value)
             if not self._cap.isOpened():
-                self._video_source = None
-                raise FailedOpenError(value)
+                raise FailedOpenError(
+                    f'Failed to open {self._video_source!r}.')
             else:
                 self._video_source = value
 
@@ -76,13 +74,13 @@ class FrameReader(Reader):
         with self._lock:
             ret, frame = self._cap.read()
             if not ret:
-                raise FailedReadError(self._video_source)
+                raise FailedReadError(
+                    f'Failed to read frame from {self._video_source!r}')
         return frame
 
     def release(self):
         with self._lock:
             self._cap.release()
-            self._video_source = None
 
     def __repr__(self) -> str:
         return f'FrameReader(video_source={self._video_source!r})'
