@@ -1,41 +1,39 @@
+"""
+    Interfaces:
+        - Streamer
+"""
+
 import asyncio
 import threading
 import websockets
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
+from typing import Callable, Any
 
+import numpy as np
 from loguru import logger
 
-from meerkat.updaters import Updater
+from meerkat.captures import Capture
+from meerkat.common import CommonException
 
 
-# --- Dataclass ---
+class TaskExistsError(CommonException): pass
 
 
 @dataclass
-class StreamingConfig:
-    uri: str
+class Config:
+    target_url: str
     timeout: float=None
 
 
-# --- Exception ---
-
-
-class TaskAlreadyExistsError(Exception):
-    def __init__(self):
-        message = 'A streaming task already exists.'
-        super().__init__(message)
-
-
-# ---Function ---
-
-
-async def streaming(updater: Updater, config: StreamingConfig):
+async def streaming(capture: Capture,
+                    config: Config,
+                    encode: Callable[[np.ndarray], Any]=None):
     try:
-        async with websockets.connect(config.uri) as ws:
+        async with websockets.connect(config.target_url) as ws:
             try:
                 while True:
-                    data = updater.read(config.timeout)
+                    data = capture.read(config.timeout, encode)
                     await ws.send(data)
                     await asyncio.sleep(0)
             except asyncio.CancelledError:
@@ -44,14 +42,11 @@ async def streaming(updater: Updater, config: StreamingConfig):
                 logger.exception('An exception has occurred within '
                                  'streaming ...')
             finally:
-                updater.stop()
-                updater.join()
+                capture.stop()
+                capture.join()
     except:
         logger.exception('An exception has occurred within connecting '
                          'to websocket server ...')
-
-
-# --- Interface ---
 
 
 class Streamer(ABC):
@@ -60,7 +55,7 @@ class Streamer(ABC):
         self._lock = threading.Lock()
 
     @abstractmethod
-    async def start(self, updater: Updater, config: StreamingConfig):
+    async def start(self, capture: Capture, config: Config):
         pass
 
     @abstractmethod
@@ -68,19 +63,17 @@ class Streamer(ABC):
         pass
 
 
-# --- Class ---
-
-
 class FrameStreamer(Streamer):
     def __init__(self):
         super().__init__()
 
-    async def start(self, updater: Updater, config: StreamingConfig):
+    async def start(self, capture: Capture, config: Config):
         with self._lock:
             if self._task is not None:
-                raise TaskAlreadyExistsError()
+                raise TaskExistsError(
+                    'A streaming task already exists.')
             self._task = asyncio.create_task(
-                streaming(updater, config))
+                streaming(capture, config))
 
     async def stop(self):
         with self._lock:
