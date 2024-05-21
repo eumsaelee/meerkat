@@ -1,3 +1,11 @@
+"""
+    Interfaces:
+        - Capture
+
+    Classes:
+        - FrameCapture(Capture)
+"""
+
 import threading
 from abc import ABC, abstractmethod
 from typing import Callable, Any
