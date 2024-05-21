@@ -49,7 +49,7 @@ class Buffer(ABC):
         pass
 
     @abstractmethod
-    def get(self, timeout: float=None) -> np.ndarray:
+    def get(self, timeout: float=30.0) -> np.ndarray:
         pass
 
 
